@@ -1,0 +1,6 @@
+pymupdf
+openai-whisper
+sentence-transformers
+chromadb
+requests
+pydub

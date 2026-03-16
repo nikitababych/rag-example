@@ -1,0 +1,10 @@
+.env
+__pycache__/
+*.pyc
+chroma_db/
+data/*.mp4
+data/*.pdf
+data/*.wav
+data/*.mp3
+venv/
+.idea
