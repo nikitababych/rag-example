@@ -1,6 +1,6 @@
 # RAG Chatbot
 
-A local RAG (Retrieval-Augmented Generation) chatbot that answers questions based on a PDF and audio lecture.
+A local RAG (Retrieval-Augmented Generation) chatbot that answers questions based on a PDF and audio lecture. Built with LangChain.
 
 ## Requirements
 
@@ -45,15 +45,26 @@ python inspect_db.py
 
 ## How it works
 
-1. **Load** — extracts text from PDF and transcribes audio via Whisper
-2. **Chunk** — splits text into ~120-word overlapping chunks
+1. **Load** — extracts text from PDF (per page) and transcribes audio via Whisper
+2. **Chunk** — PDF: merges short slides with neighbors to preserve context; Audio: semantic chunking (LangChain `SemanticChunker`) with a max-size second pass to keep chunks focused
 3. **Embed** — converts chunks to vectors using `all-MiniLM-L6-v2` (local, free)
-4. **Store** — saves embeddings to ChromaDB (local, no server needed)
-5. **Retrieve** — finds the 5 most relevant chunks for each question
-6. **Generate** — passes question + context to Ollama (local LLM) for the final answer
+4. **Store** — saves embeddings to ChromaDB via LangChain Chroma integration
+5. **Retrieve** — multi-query retriever generates alternative phrasings of the question via the LLM, then retrieves top-8 results per variant and deduplicates
+6. **Generate** — LangChain LCEL chain passes question + context to Ollama (`ChatOllama`) for the final answer
+
+## Key dependencies
+
+- **LangChain** — orchestration, retrieval, prompt templates, LCEL chains
+- **LangChain Experimental** — `SemanticChunker` for meaning-based text splitting
+- **LangChain Chroma** — ChromaDB vector store integration
+- **LangChain Ollama** — local LLM via `ChatOllama`
+- **LangChain HuggingFace** — `HuggingFaceEmbeddings` for local sentence-transformers
+- **Whisper** — audio transcription
+- **PyMuPDF** — PDF text extraction
 
 ## Notes
 
 - Everything runs **100% locally** — no API keys, no cost
 - ChromaDB stores data in the `chroma_db/` folder (auto-created)
 - To rebuild the vector DB, just run the full ingest again — it clears and rebuilds automatically
+- Multi-query retrieval adds a small latency overhead (one extra LLM call per question) but significantly improves recall

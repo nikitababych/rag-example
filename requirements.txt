@@ -1,6 +1,9 @@
 pymupdf
 openai-whisper
-sentence-transformers
-chromadb
-requests
+langchain
+langchain-community
+langchain-experimental
+langchain-huggingface
+langchain-chroma
+langchain-ollama
 pydub
